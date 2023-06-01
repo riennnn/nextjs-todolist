@@ -1,4 +1,9 @@
 import Head from 'next/head'
+import Link from 'next/link'
+import React, { useState } from 'react';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import db from "../src/firebase"
+
 import {
   Heading,
   Input,
@@ -7,14 +12,51 @@ import {
   FormControl,
   FormLabel,
   Box,
-  Text,
-  HStack,
-  Radio,
-  RadioGroup,
   Container,
 } from "@chakra-ui/react";
 
 const CreateTodo = () => {
+  const [todoTitle, setTodoTitle] = useState('') //title欄へのデータを保持する
+  const [todoText, setTodoText] = useState('') //detail欄へのデータを保持する
+  const [todos, setTodos] = useState([]) //入力したtodoをリスト管理する
+  // const [todoId, setTodoId] = useState(todos.length + 1) //新規todoのidを定義
+
+  //※とりあえずデータはとぶが、idは１のまま。リスト展開したときに追加されるのか確認する
+
+  const handleSubmit = e => { 
+    e.preventDefault()
+    setTodos
+    ({
+      title: todoTitle,
+      detail: todoText, 
+      // id: todoId
+    })
+    addDoc(collection(db, "todos"), {
+      // id:todoId,
+      title:todoTitle,
+      detail: todoText,
+      status: "not started",
+      // createDate: serverTimestamp(),
+      //秒以下の取得エラーが出る
+    });
+    setTodoTitle("");
+    setTodoText("");
+    // setTodoId(todoId + 1)
+    // addTodo(todoTitle) //handleSubmitの中で呼ぶ
+  }
+  
+  // const addTodo = text => {
+  //   const newTodos = [...todos, text]
+  //   setTodos(newTodos)
+  // }
+  // //③formから新たに追加したtodoをいれる関数
+  // //③新たなTodoリスト(newTodos)をsetTodosを使ってtodoStateへ保存
+  // const handleAddTodo = () => {
+  //   setTodos([...todos, {id: todoId, title: todoTitle, status:'not started'}])
+  //   setTodoId(todoId + 1)
+  //   // ④createボタンを押すと新規todoがリストへ追加される
+  // }
+
   return (
     <>
       <Head>
@@ -41,7 +83,7 @@ const CreateTodo = () => {
             </Button>
         </Box>
 
-          <form>
+          <form onSubmit={handleSubmit}>
             <Box w="100%" margin="0 auto">
               <FormControl mb="20px">
                 <FormLabel 
@@ -53,14 +95,15 @@ const CreateTodo = () => {
                   TITLE
                 </FormLabel>
                 <Input
-                  id="title"
+                  id="title" //ここのidと採番されるidの違い
                   type="text"
-                  value=""
+                  placeholder="Text"
                   h="70px"
                   fontSize='20px'
                   rounded='10px'
                   borderColor='blackAlpha.800'
-                  placeholder="Text"
+                  value={todoTitle} //①inputした値を入るようにする
+                  onChange={e => setTodoTitle(e.target.value)} //①値が変更されるようにする
                 />
               </FormControl>
               <FormControl mb="20px">
@@ -73,45 +116,34 @@ const CreateTodo = () => {
                   DETAIL
                 </FormLabel>
                 <Textarea 
-                  id="description" 
-                  value="" 
+                  id="detail" 
                   placeholder="Text" 
                   h='320px'
                   rounded='10px'
                   borderColor='blackAlpha.800'
                   fontSize='20px'
+                  value={todoText}
+                  onChange={e => setTodoText(e.target.value)}
                 />
-              </FormControl>
-              <FormControl>
-                <FormLabel
-                  htmlFor="description" 
-                  fontSize='24px'
-                  fontWeight='bold'
-                  lineHeight={1}
-                >
-                  PRIORITY
-                </FormLabel>
-                <RadioGroup value="">
-                  <HStack spacing="24px">
-                    <Radio value="male">High</Radio>
-                    <Radio value="female">Middle</Radio>
-                    <Radio value="other">Low</Radio>
-                  </HStack>
-                </RadioGroup>
               </FormControl>
             </Box>
             <Box display="flex" justifyContent="flex-end">
-              <Button
-                type="submit"
-                box-sizing="border-box"
-                bg="yellow.200"
-                borderRadius="full"
-                w="112px"
-              >
-                CREATE
-              </Button>
+                <Button
+                  type="submit"
+                  box-sizing="border-box"
+                  bg="yellow.200"
+                  borderRadius="full"
+                  w="112px"
+                  // onClick={handleAddTodo} 
+                >
+                  CREATE
+                </Button>
             </Box>
           </form>
+              <Link href="/home">
+                ホームへ
+              </Link>
+              {/* createButtonと一緒にページ遷移したいが、Button前後にリンクを入れるとデータとばない クエリパラメーターを使う？*/}
         </Container>
       </Box>
     </>
