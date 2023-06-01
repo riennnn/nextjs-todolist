@@ -1,7 +1,7 @@
 import Head from 'next/head'
-import Link from 'next/link'
+import { useRouter } from 'next/router';
 import React, { useState } from 'react';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { addDoc, collection } from 'firebase/firestore';
 import db from "../src/firebase"
 
 import {
@@ -21,7 +21,7 @@ const CreateTodo = () => {
   const [todos, setTodos] = useState([]) //入力したtodoをリスト管理する
   // const [todoId, setTodoId] = useState(todos.length + 1) //新規todoのidを定義
 
-  //※とりあえずデータはとぶが、idは１のまま。リスト展開したときに追加されるのか確認する
+  const router = useRouter();
 
   const handleSubmit = e => { 
     e.preventDefault()
@@ -43,8 +43,9 @@ const CreateTodo = () => {
     setTodoText("");
     // setTodoId(todoId + 1)
     // addTodo(todoTitle) //handleSubmitの中で呼ぶ
+    router.push('/home')
   }
-  
+
   // const addTodo = text => {
   //   const newTodos = [...todos, text]
   //   setTodos(newTodos)
@@ -78,6 +79,7 @@ const CreateTodo = () => {
               borderRadius="full"
               w="112px"
               mt="15px"
+              onClick={() => router.push('/home')}
             >
               Back
             </Button>
@@ -140,10 +142,6 @@ const CreateTodo = () => {
                 </Button>
             </Box>
           </form>
-              <Link href="/home">
-                ホームへ
-              </Link>
-              {/* createButtonと一緒にページ遷移したいが、Button前後にリンクを入れるとデータとばない クエリパラメーターを使う？*/}
         </Container>
       </Box>
     </>

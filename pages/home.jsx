@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import React, { useState, useEffect } from 'react'
-import { Heading, Select, Box, Flex, Spacer, Container } from '@chakra-ui/react'
+import { Heading, Select, Box, Flex, Container } from '@chakra-ui/react'
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import {
   Table,
@@ -12,7 +12,6 @@ import {
   TableContainer,
 } from '@chakra-ui/react'
 
-import { ResetButton } from './components/resetButton'
 import { SearchInput } from './components/searchInput'
 import db from "../src/firebase"
 import { collection, getDocs } from "firebase/firestore";
@@ -20,51 +19,34 @@ import { collection, getDocs } from "firebase/firestore";
 
 function Home() {
 
-  const status = [
-    {
-      text: "not started",
-      backgroundColor: "orange.100",
-      color: "blackAlpha.800",
-      word: "NOT STARTED"
-    },
+  // const status = [
+  //   {
+  //     text: "not started",
+  //     backgroundColor: "orange.100",
+  //     color: "blackAlpha.800",
+  //     word: "NOT STARTED"
+  //   },
   
-    {
-      text: "doing",
-      backgroundColor: "orange.500",
-      color: "white",
-      word: "DOING"
-    },
+  //   {
+  //     text: "doing",
+  //     backgroundColor: "orange.500",
+  //     color: "white",
+  //     word: "DOING"
+  //   },
   
-    {
-      text: "done",
-      backgroundColor: "orange.300",
-      color: "blackAlpha.800",
-      word: "DONE"
-    }
-  ];  
+  //   {
+  //     text: "done",
+  //     backgroundColor: "orange.300",
+  //     color: "blackAlpha.800",
+  //     word: "DONE"
+  //   }
+  // ];  
 
-  // const [todos, setTodos] = useState([
-  //   { id: 1,
-  //     title: "Github上に静的サイトをホスティングする",
-  //     status: "not started",
-  //     createDate: "2020-11-8 18:55",
-  //     action: "icons",
-  //   },
-  //   { id: 2,
-  //     title: "ReactでTodoサイトを作成する",
-  //     status: "doing",
-  //     createDate: "2020-11-8 18:55",
-  //     action: "icons",
-  //   },
-  //   { id: 3,
-  //     title: "Firestore Hostingを学習する",
-  //     status: "done",
-  //     createDate: "2020-11-8 18:55",
-  //     action: "icons",
-  //   },
-  // ]); //②todoリストのstateを定義（初期値）
-
-  const [todos, setTodos] = useState([])
+  const [todos, setTodos] = useState([]) //初期のtodoリスト定義
+  const [filter, setFilter] = useState('-------')
+  // statusのフィルター自体の定義
+  const [filteredTodos, setFilteredTodos] = useState([])
+  // 絞り込んだ後のtodoリストのデータ定義
 
   const [todoSearchTitle, setTodoSearchTitle] = useState('');
   // const [todoId, setTodoId] = useState(todos.length +1)
@@ -72,10 +54,6 @@ function Home() {
   // const [isEditable, setIsEditable] = useState(false)
   // const[editId, setEditId] = useState('')
   // const [newTitle, setNewTitle] = useState('')
-  const [filter, setFilter] = useState('-------')
-  // statusのフィルター自体の定義
-  const [filteredTodos, setFilteredTodos] = useState([])
-  // 絞り込んだ後のtodoリストのデータ定義
 
   // const handleDeleteTodo = (targetTodo) => {
   //   setTodos(todos.filter((todo) => todo !==targetTodo))
@@ -105,7 +83,7 @@ function Home() {
     // querySnapshotの中のdocs情報を見る→それをmap関数で一つずつ取り出し
     // ひとつずつ取り出したデータをdocという形で置く→そのdocの中のdata関数
       setTodos(querySnapshot.docs.map((doc) => doc.data()))
-  })
+    })
   },[])
 
   //Statusを変更して新しいtodoリストを作成
@@ -156,11 +134,11 @@ function Home() {
         <Container w='100%' maxW='1080px' pt='16px'>
           <Heading as='h2' size='2xl' mt="2">TODO LIST</Heading>
           <Box display='flex' mt='32px' mb='32px'> 
-
             <Box>
               <p>SEARCH</p>
               <SearchInput todoSearchTitle={todoSearchTitle} setTodoSearchTitle={setTodoSearchTitle} />
             </Box>
+
             <Box ml='15px'>
               <p>STATUS</p>
               <Select value={filter} onChange={(e) => setFilter(e.target.value)}>
@@ -170,11 +148,6 @@ function Home() {
                 <option value='doing'>DOING</option>
                 <option value='done'>DONE</option>
               </Select>
-            </Box>
-            <ResetButton />
-            <Spacer />
-            <Box mt='10'>
-              <EditIcon />
             </Box>
           </Box>
 
@@ -192,23 +165,36 @@ function Home() {
                 {filteredTodos.map((todo)=> (
                 // {todos.map((todo) => (
                   <Tr key={todo.id}>
+                    
                     <Td fontWeight="bold">{todo.title}</Td>
 
                     <Td>
-                      <Select 
-                        // bg={status.map((value) => todo.status === value.text && value.backgroundColor)}
+                      {/* <Select 
+                        // bg={status.map((value) => todo.status === value.text && value.backgroundColor)}元々コメントアウト
                         bg={status.find((value) => todo.status === value.text).backgroundColor}
                         color={status.find((value) => todo.status === value.text).color}
                         borderColor='blackAlpha.800'
                         borderRadius='full'
                         value={todo.status} 
-                        // セレクトボックスを操作時にhandleStatusChange関数が呼ばれる
+                        // セレクトボックスを操作時にhandleStatusChange関数が呼ばれる 元々コメントアウト
                         onChange={(e) => handleStatusChange(todo, e)}
                         fontWeight="bold"
                       >
                         {status.map((value, index) => (
                           <option key={index} value={value.text}>{value.word}</option>
                         ))}
+                      </Select> */}
+                      <Select 
+                        bg="orange.400"
+                        border='none'
+                        borderRadius='full'
+                        fontWeight="bold"
+                        value={todo.status} 
+                        onChange={(e) => handleStatusChange(todo, e)}    
+                      >
+                        <option value="not started">NOT STARTED</option>
+                        <option value="doing">DOING</option>
+                        <option value="done">DONE</option>
                       </Select>
                     </Td>
 
