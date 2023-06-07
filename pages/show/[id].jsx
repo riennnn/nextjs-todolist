@@ -67,8 +67,9 @@ const TodoShow = () => {
               fontSize='20px'
               type='text'
               borderColor='blackAlpha.800'
-              title={title}
-            />
+            >
+              {title}
+            </Box>
           </Box>
           <Box mb='20px' borderRadius={"10px"}
           border={"1px"}
@@ -86,8 +87,8 @@ const TodoShow = () => {
               h='320px'
               borderColor='blackAlpha.800'
               fontSize='20px'
-              value={detail}
             >
+              {detail}
             </Box>
           </Box>            
         </Box>

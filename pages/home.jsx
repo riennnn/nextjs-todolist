@@ -101,11 +101,12 @@ function Home() {
     filteringTodos()
   }, [filter, todos])
   // フィルター操作と、todoリストの変更時に実行
-
+  
     //対象のtodoを削除する
     const handleDeleteTodo = (targetTodo) => {
-      // deleteDoc(doc(db, "todos", id));
-      //※第３引数−>idではだめ　doc.idも引っ張れない
+      deleteDoc(doc(db, "todos", targetTodo.id));
+      //※第３引数−>deleteIconのところで(todo)を引数としてとっているため、idの取得ができている
+      //よって、targetTodo.idとすることで対象のidを指定できる
       setTodos(todos.filter((todo) => todo !==targetTodo))
       console.log("targetTodoです", targetTodo)
     }
@@ -199,7 +200,6 @@ function Home() {
                             // "edit/[1]"で確かめた
                             //指定したidを取得する
                           )}
-                          // onClick={() =>handleOpenEditPage(todo)}
                         >
                           <EditIcon />
                         </button>
