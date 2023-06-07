@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { addDoc, collection } from 'firebase/firestore';
 import db from "../src/firebase"
-
 import {
   Heading,
   Input,
@@ -14,12 +13,12 @@ import {
   Box,
   Container,
 } from "@chakra-ui/react";
+import { BackButton } from '../components/backButton';
 
 const CreateTodo = () => {
   const [todoTitle, setTodoTitle] = useState('') //title欄へのデータを保持する
   const [todoText, setTodoText] = useState('') //detail欄へのデータを保持する
   const [todos, setTodos] = useState([]) //入力したtodoをリスト管理する
-  // const [todoId, setTodoId] = useState(todos.length + 1) //新規todoのidを定義
 
   const router = useRouter();
 
@@ -29,19 +28,14 @@ const CreateTodo = () => {
     ({
       title: todoTitle,
       detail: todoText, 
-      // id: todoId
     })
     addDoc(collection(db, "todos"), {
-      // id:todoId,
       title:todoTitle,
       detail: todoText,
       status: "not started",
-      // createDate: serverTimestamp(),
-      //秒以下の取得エラーが出る
     });
     setTodoTitle("");
     setTodoText("");
-    // setTodoId(todoId + 1)
     // addTodo(todoTitle) //handleSubmitの中で呼ぶ
     router.push('/home')
   }
@@ -73,16 +67,7 @@ const CreateTodo = () => {
         <Container w='85%' maxW='1080px' pt='16px'>
           <Box pb="15px" h="63" display="flex" justifyContent="space-between">
             <Heading as='h2' size='2xl' mt="2">NEW TODO</Heading>
-            <Button
-              bg="yellow.500"
-              color="white"
-              borderRadius="full"
-              w="112px"
-              mt="15px"
-              onClick={() => router.push('/home')}
-            >
-              Back
-            </Button>
+            <BackButton />
         </Box>
 
           <form onSubmit={handleSubmit}>
@@ -104,8 +89,8 @@ const CreateTodo = () => {
                   fontSize='20px'
                   rounded='10px'
                   borderColor='blackAlpha.800'
-                  value={todoTitle} //①inputした値を入るようにする
-                  onChange={e => setTodoTitle(e.target.value)} //①値が変更されるようにする
+                  value={todoTitle} //inputした値を入るよう紐付け
+                  onChange={e => setTodoTitle(e.target.value)} //値が変更されるようにする
                 />
               </FormControl>
               <FormControl mb="20px">

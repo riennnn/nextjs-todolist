@@ -1,7 +1,10 @@
 import Head from 'next/head'
+import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react'
-import { Heading, Select, Box, Flex, Container } from '@chakra-ui/react'
-import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
+import db from "../src/firebase"
+import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
+import { Heading, Select, Box, Flex, Container, Spacer } from '@chakra-ui/react'
+import { DeleteIcon, EditIcon, ViewIcon } from '@chakra-ui/icons'
 import {
   Table,
   Thead,
@@ -12,79 +15,65 @@ import {
   TableContainer,
 } from '@chakra-ui/react'
 
-import { SearchInput } from './components/searchInput'
-import db from "../src/firebase"
-import { collection, getDocs } from "firebase/firestore";
-
-
 function Home() {
+  const router = useRouter();
 
-  // const status = [
-  //   {
-  //     text: "not started",
-  //     backgroundColor: "orange.100",
-  //     color: "blackAlpha.800",
-  //     word: "NOT STARTED"
-  //   },
-  
-  //   {
-  //     text: "doing",
-  //     backgroundColor: "orange.500",
-  //     color: "white",
-  //     word: "DOING"
-  //   },
-  
-  //   {
-  //     text: "done",
-  //     backgroundColor: "orange.300",
-  //     color: "blackAlpha.800",
-  //     word: "DONE"
-  //   }
-  // ];  
-
-  const [todos, setTodos] = useState([]) //初期のtodoリスト定義
+  const [todos, setTodos] = useState([]) 
+  //初期のtodoリスト定義
   const [filter, setFilter] = useState('-------')
   // statusのフィルター自体の定義
   const [filteredTodos, setFilteredTodos] = useState([])
   // 絞り込んだ後のtodoリストのデータ定義
 
-  const [todoSearchTitle, setTodoSearchTitle] = useState('');
-  // const [todoId, setTodoId] = useState(todos.length +1)
-  //idの関係でいらない？
-  // const [isEditable, setIsEditable] = useState(false)
-  // const[editId, setEditId] = useState('')
-  // const [newTitle, setNewTitle] = useState('')
+  // //firebaseからデータを呼び出す
+  // useEffect(() => {
+  //   const todoData = collection(db, "todos"); 
+  //   getDocs(todoData).then((querySnapshot) => {
+  //   // objectで返ってきたら、querySnapshotでデータを取ってくる
+  //   // querySnapshotの中のdocs情報を見る→それをmap関数で一つずつ取り出し
+  //   // ひとつずつ取り出したデータをdocという形で置く→そのdocの中のdata関数
+  //     setTodos(querySnapshot.docs.map((doc) => {
+  //       console.log(doc.data()) 
+  //       return {...doc.data(), id: doc.id}}))
 
-  // const handleDeleteTodo = (targetTodo) => {
-  //   setTodos(todos.filter((todo) => todo !==targetTodo))
-  // }
-
-  // const handleOpenEditPage = (todo) => {
-  //   setIsEditable(true)
-  //   setEditId(todo.id)
-  //   setNewTitle(todo.title) //必要？
-  // }
-
-  //元々コメントアウト
-  // const handleEditTodo = () => {
-  //   const newArray = todos.map((todo) =>
-  //   todo.id === editId? {...todo, title:newTitle} : todo)setTodos(newArray)
-  //   setNewTitle('')
-  //   setEditId('')
-  // }
-  //ここまで
+  //   })
+    
+  // },[])
+  // console.log(todos)
 
   //firebaseからデータを呼び出す
   useEffect(() => {
-    const todoData = collection(db, "todos"); 
-    //collection関数をつかってfirebaseのtodosデータを取得する todoDataの値を取得
-    getDocs(todoData).then((querySnapshot) => {
-    // objectで返ってきたら、querySnapshotでデータを取ってくる
-    // querySnapshotの中のdocs情報を見る→それをmap関数で一つずつ取り出し
-    // ひとつずつ取り出したデータをdocという形で置く→そのdocの中のdata関数
-      setTodos(querySnapshot.docs.map((doc) => doc.data()))
-    })
-  },[])
+    const todoData = collection(db, "todos");
+     //collection関数をつかってfirebaseのtodosデータを取得する todoDataの値を取得
+    onSnapshot(todoData, (snapshot) => {
+     // onSnapshotでtodoData (collectionで取得したもの)を取得
+     // objectで返ってきたら、snapshot(命名)でデータを取ってくる
+     // onSnapshotにすることで更新した新しいtodoが入るようになる
+      const newTodos = [];
+      //新しいtodosリストは空配列と定義
+      snapshot.docs.map((doc) => {
+     // snapshotの中のdocs情報を見る→それをmap関数で一つずつ取り出し
+     // ひとつずつ取り出したデータをdocという形で置く→そのdocの中のdata関数
+     // documentの中が確認できるようになる
+        const todo = {
+          id: doc.id,
+          // ドキュメントidを取得
+          title: doc.data().title,
+          detail: doc.data().detail, 
+          status: doc.data().status,
+          //data()はもう一つ下の階層、status,detail,titleなどのキーを指定し、その値を書く
+          action: "icons",
+        };
+        newTodos.push({ ...todo });
+        //新しいTodosリストにpush関数で各項目を追加
+      });
+      setTodos(newTodos);
+      //setTodos関数にてtodosへ保持するようにする
+    });
+  }, []);
+
+
+  // console.log(todos.map((todo) => todo));
 
   //Statusを変更して新しいtodoリストを作成
   const handleStatusChange = (targetTodo, e) => {
@@ -112,12 +101,14 @@ function Home() {
     filteringTodos()
   }, [filter, todos])
   // フィルター操作と、todoリストの変更時に実行
-  
-  //元々コメントアウト
-  // const handleSearchFormChanges = (e) => {
-  //   setTodoSearchTitle(e.target.value)
-  // }
-  //ここまで
+
+    //対象のtodoを削除する
+    const handleDeleteTodo = (targetTodo) => {
+      // deleteDoc(doc(db, "todos", id));
+      //※第３引数−>idではだめ　doc.idも引っ張れない
+      setTodos(todos.filter((todo) => todo !==targetTodo))
+      console.log("targetTodoです", targetTodo)
+    }
 
   return (
     <div>
@@ -133,15 +124,11 @@ function Home() {
       <Box maxW='1080px' m='0 auto'>
         <Container w='100%' maxW='1080px' pt='16px'>
           <Heading as='h2' size='2xl' mt="2">TODO LIST</Heading>
-          <Box display='flex' mt='32px' mb='32px'> 
-            <Box>
-              <p>SEARCH</p>
-              <SearchInput todoSearchTitle={todoSearchTitle} setTodoSearchTitle={setTodoSearchTitle} />
-            </Box>
 
+          <Box display='flex' mt='32px' mb='32px'> 
             <Box ml='15px'>
               <p>STATUS</p>
-              <Select value={filter} onChange={(e) => setFilter(e.target.value)}>
+              <Select variant='filled' value={filter} onChange={(e) => setFilter(e.target.value)}>
                 {/* フィルターの中身を変えて保持 */}
                 <option value='all'>-------</option>
                 <option value='notStarted'>NOT STARTED</option>
@@ -149,6 +136,16 @@ function Home() {
                 <option value='done'>DONE</option>
               </Select>
             </Box>
+            <Spacer />
+            <EditIcon 
+              mt="10" 
+              bg='pink'
+              fontSize="30px"
+              padding="5px"
+              borderRadius="full"
+              onClick={() => router.push('/create')}
+              cursor="pointer"
+            />
           </Box>
 
           <TableContainer>
@@ -157,33 +154,16 @@ function Home() {
                 <Tr>
                   <Th textAlign="center" fontSize="2xl" textTransform="none">Task</Th>
                   <Th textAlign="center" fontSize="2xl" textTransform="none">Status</Th>
-                  {/* <Th textAlign="center" fontSize="2xl" textTransform="none">Create</Th> */}
                   <Th textAlign="center" fontSize="2xl" textTransform="none">Action</Th>
                 </Tr>
               </Thead>
               <Tbody>
                 {filteredTodos.map((todo)=> (
-                // {todos.map((todo) => (
                   <Tr key={todo.id}>
-                    
+                  {/* todo.idはdoc.idからきてる */}
                     <Td fontWeight="bold">{todo.title}</Td>
 
                     <Td>
-                      {/* <Select 
-                        // bg={status.map((value) => todo.status === value.text && value.backgroundColor)}元々コメントアウト
-                        bg={status.find((value) => todo.status === value.text).backgroundColor}
-                        color={status.find((value) => todo.status === value.text).color}
-                        borderColor='blackAlpha.800'
-                        borderRadius='full'
-                        value={todo.status} 
-                        // セレクトボックスを操作時にhandleStatusChange関数が呼ばれる 元々コメントアウト
-                        onChange={(e) => handleStatusChange(todo, e)}
-                        fontWeight="bold"
-                      >
-                        {status.map((value, index) => (
-                          <option key={index} value={value.text}>{value.word}</option>
-                        ))}
-                      </Select> */}
                       <Select 
                         bg="orange.400"
                         border='none'
@@ -198,27 +178,40 @@ function Home() {
                       </Select>
                     </Td>
 
-                    {/* <Td textAlign="center" fontWeight="bold">
-                      {todo.createDate}
-                    </Td> */}
-
                     <Td>
                       <Flex justifyContent="center">
                         <button style=
                           {{display: "inline-block", marginRight: "10px"}} 
+                          ml='150px' 
+                          onClick={() => router.push(
+                            `show/${todo.id}`
+                          )}
+                        >
+                          <ViewIcon />
+                        </button>
+                        <button style=
+                          {{display: "inline-block", marginRight: "10px"}} 
                           ml='150px'  
+                          onClick={() => router.push(
+                            // pathname: '/edit/[todoId]',
+                            // query: {todoId: doc.id},
+                            `edit/${todo.id}`
+                            // "edit/[1]"で確かめた
+                            //指定したidを取得する
+                          )}
                           // onClick={() =>handleOpenEditPage(todo)}
                         >
                           <EditIcon />
                         </button>
                         <button 
-                          // onClick={() => handleDeleteTodo(todo)}
+                          onClick={() => handleDeleteTodo(todo)}
                           ml={5}
                         >
                           <DeleteIcon />
                         </button>
                       </Flex>
                     </Td>
+                    
                   </Tr>
                 ))}
               </Tbody>
