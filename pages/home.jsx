@@ -24,7 +24,7 @@ function Home() {
   // statusのフィルター自体の定義
   const [filteredTodos, setFilteredTodos] = useState([])
   // 絞り込んだ後のtodoリストのデータ定義
-  const [status, setStatus]  = useState("")
+  // const [status, setStatus]  = useState("")
   //firebaseから取得したステータスを保持
 
   //status欄の変更に応じてstatusを更新
@@ -89,11 +89,11 @@ function Home() {
   const handleStatusListChange = (targetTodo, e) => {
     e.preventDefault();
     updateDoc(doc(db, "todos", targetTodo.id),{
-      status:status
+      status:e.target.value
     });
-    const newArray = todos.map((todo) => todo.id === targetTodo.id ? {...todo, status:e.target.value } : todo )
-    setStatus(e.target.value)
-    setTodos(newArray)
+    // const newArray = todos.map((todo) => todo.id === targetTodo.id ? {...todo, status:e.target.value } : todo )画面上のステータスを更新するfirebasesから情報を引用することで不要となる
+    // setStatus(e.target.value)
+    // setTodos(newArray)
     console.log("ターゲット", (e.target.value))
   }
 
