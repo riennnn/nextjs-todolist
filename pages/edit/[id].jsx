@@ -19,6 +19,7 @@ const Edit =()=>{
 
   const router = useRouter();
   const todoId = router.query.id;
+  //動的ルートのurlが入ってくる
   //home.jsxページからの遷移コード、todo.idから渡された情報をrouter.query.idで受け取る
   //router.queryとすると動的ルーティングを取得できる
   // console.log(router)

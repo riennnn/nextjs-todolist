@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react'
 import db from "../src/firebase"
-import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
+import { collection, deleteDoc, doc, onSnapshot, updateDoc } from "firebase/firestore";
 import { Heading, Select, Box, Flex, Container, Spacer } from '@chakra-ui/react'
 import { DeleteIcon, EditIcon, ViewIcon } from '@chakra-ui/icons'
 import {
@@ -24,6 +24,13 @@ function Home() {
   // statusのフィルター自体の定義
   const [filteredTodos, setFilteredTodos] = useState([])
   // 絞り込んだ後のtodoリストのデータ定義
+  const [status, setStatus]  = useState("")
+  //firebaseから取得したステータスを保持
+
+  //status欄の変更に応じてstatusを更新
+  // const handleStatusListChange = (e) => {
+  //   setStatus(e.target.value)
+  // }
 
   // //firebaseからデータを呼び出す
   // useEffect(() => {
@@ -71,14 +78,23 @@ function Home() {
       //setTodos関数にてtodosへ保持するようにする
     });
   }, []);
-
-
   // console.log(todos.map((todo) => todo));
 
+  //更新したstatusを保持する
+  // const handleStatusChange = (e) => {
+  //   setStatus(e.target.value)
+  // }
+
   //Statusを変更して新しいtodoリストを作成
-  const handleStatusChange = (targetTodo, e) => {
+  const handleStatusListChange = (targetTodo, e) => {
+    e.preventDefault();
+    updateDoc(doc(db, "todos", targetTodo.id),{
+      status:status
+    });
     const newArray = todos.map((todo) => todo.id === targetTodo.id ? {...todo, status:e.target.value } : todo )
+    setStatus(e.target.value)
     setTodos(newArray)
+    console.log("ターゲット", (e.target.value))
   }
 
   useEffect(() => {
@@ -108,7 +124,7 @@ function Home() {
       //※第３引数−>deleteIconのところで(todo)を引数としてとっているため、idの取得ができている
       //よって、targetTodo.idとすることで対象のidを指定できる
       setTodos(todos.filter((todo) => todo !==targetTodo))
-      console.log("targetTodoです", targetTodo)
+      // console.log("targetTodoです", targetTodo)
     }
 
   return (
@@ -171,7 +187,8 @@ function Home() {
                         borderRadius='full'
                         fontWeight="bold"
                         value={todo.status} 
-                        onChange={(e) => handleStatusChange(todo, e)}    
+                        // onChange={handleStatusChange}
+                        onChange={(e) => handleStatusListChange(todo, e)}    
                       >
                         <option value="not started">NOT STARTED</option>
                         <option value="doing">DOING</option>
