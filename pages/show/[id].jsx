@@ -6,7 +6,7 @@ import {
 } from "@chakra-ui/react";
 import { BackButton } from '../../components/backButton';
 import { doc, getDoc } from 'firebase/firestore';
-import db from '../../src/firebase';
+import db from '../../libs/firebase';
 import { useRouter } from 'next/router';
 
 const TodoShow = () => {

@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { addDoc, collection } from 'firebase/firestore';
-import db from "../src/firebase"
+import db from "../libs/firebase"
 import {
   Heading,
   Input,

@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react'
-import db from "../src/firebase"
+import db from "../libs/firebase"
 import { collection, deleteDoc, doc, onSnapshot, updateDoc } from "firebase/firestore";
 import { Heading, Select, Box, Flex, Container, Spacer } from '@chakra-ui/react'
 import { DeleteIcon, EditIcon, ViewIcon } from '@chakra-ui/icons'
