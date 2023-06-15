@@ -24,11 +24,6 @@ const CreateTodo = () => {
 
   const handleSubmit = e => { 
     e.preventDefault()
-    setTodos
-    ({
-      title: todoTitle,
-      detail: todoText, 
-    })
     addDoc(collection(db, "todos"), {
       title:todoTitle,
       detail: todoText,
@@ -36,21 +31,10 @@ const CreateTodo = () => {
     });
     setTodoTitle("");
     setTodoText("");
-    // addTodo(todoTitle) //handleSubmitの中で呼ぶ
     router.push('/home')
   }
 
-  // const addTodo = text => {
-  //   const newTodos = [...todos, text]
-  //   setTodos(newTodos)
-  // }
-  // //③formから新たに追加したtodoをいれる関数
-  // //③新たなTodoリスト(newTodos)をsetTodosを使ってtodoStateへ保存
-  // const handleAddTodo = () => {
-  //   setTodos([...todos, {id: todoId, title: todoTitle, status:'not started'}])
-  //   setTodoId(todoId + 1)
-  //   // ④createボタンを押すと新規todoがリストへ追加される
-  // }
+
 
   return (
     <>
@@ -120,8 +104,7 @@ const CreateTodo = () => {
                   box-sizing="border-box"
                   bg="yellow.200"
                   borderRadius="full"
-                  w="112px"
-                  // onClick={handleAddTodo} 
+                  w="112px" 
                 >
                   CREATE
                 </Button>

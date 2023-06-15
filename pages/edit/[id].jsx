@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Head from 'next/head'
-import db from "../../src/firebase"
+import db from "../../libs/firebase"
 import { getDoc, doc, updateDoc } from 'firebase/firestore';
 import { 
   Box, 

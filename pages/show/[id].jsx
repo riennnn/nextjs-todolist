@@ -14,15 +14,26 @@ const TodoShow = () => {
   const router = useRouter();
   const todoId = router.query.id;
 
-  const [title, setTitle] = useState("")
-  const [detail, setDetail] = useState("");
+  const [state, setState] = useState({
+    title: "",
+    detail: ""
+  });
+  
+  const setFields = (newTitle, newDetail) => {
+    setState(prevState => ({
+      ...prevState,
+      title: newTitle,
+      detail: newDetail
+    }));
+  };
+  
+
 
   useEffect(() => {
     const fetchData = async () => {
       const docRef = doc(db, "todos", todoId);
       const docSnap = await getDoc(docRef);
-      setTitle(docSnap.data().title);
-      setDetail(docSnap.data().detail);
+      setFields(docSnap.data().title, docSnap.data().detail);
       // console.log(docSnap.data().title)
     }; 
     if (todoId) {
@@ -68,7 +79,7 @@ const TodoShow = () => {
               type='text'
               borderColor='blackAlpha.800'
             >
-              {title}
+              {state.title}
             </Box>
           </Box>
           <Box mb='20px' borderRadius={"10px"}
@@ -88,7 +99,7 @@ const TodoShow = () => {
               borderColor='blackAlpha.800'
               fontSize='20px'
             >
-              {detail}
+              {state.detail}
             </Box>
           </Box>            
         </Box>

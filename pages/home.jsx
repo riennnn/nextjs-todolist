@@ -23,30 +23,6 @@ function Home() {
   const [filter, setFilter] = useState('-------')
   // statusのフィルター自体の定義
   const [filteredTodos, setFilteredTodos] = useState([])
-  // 絞り込んだ後のtodoリストのデータ定義
-  // const [status, setStatus]  = useState("")
-  //firebaseから取得したステータスを保持
-
-  //status欄の変更に応じてstatusを更新
-  // const handleStatusListChange = (e) => {
-  //   setStatus(e.target.value)
-  // }
-
-  // //firebaseからデータを呼び出す
-  // useEffect(() => {
-  //   const todoData = collection(db, "todos"); 
-  //   getDocs(todoData).then((querySnapshot) => {
-  //   // objectで返ってきたら、querySnapshotでデータを取ってくる
-  //   // querySnapshotの中のdocs情報を見る→それをmap関数で一つずつ取り出し
-  //   // ひとつずつ取り出したデータをdocという形で置く→そのdocの中のdata関数
-  //     setTodos(querySnapshot.docs.map((doc) => {
-  //       console.log(doc.data()) 
-  //       return {...doc.data(), id: doc.id}}))
-
-  //   })
-    
-  // },[])
-  // console.log(todos)
 
   //firebaseからデータを呼び出す
   useEffect(() => {
@@ -78,12 +54,7 @@ function Home() {
       //setTodos関数にてtodosへ保持するようにする
     });
   }, []);
-  // console.log(todos.map((todo) => todo));
-
-  //更新したstatusを保持する
-  // const handleStatusChange = (e) => {
-  //   setStatus(e.target.value)
-  // }
+  // console.log(todos.map((todo) => todo)); 
 
   //Statusを変更して新しいtodoリストを作成
   const handleStatusListChange = (targetTodo, e) => {
@@ -91,10 +62,7 @@ function Home() {
     updateDoc(doc(db, "todos", targetTodo.id),{
       status:e.target.value
     });
-    // const newArray = todos.map((todo) => todo.id === targetTodo.id ? {...todo, status:e.target.value } : todo )画面上のステータスを更新するfirebasesから情報を引用することで不要となる
-    // setStatus(e.target.value)
-    // setTodos(newArray)
-    console.log("ターゲット", (e.target.value))
+    // console.log("ターゲット", (e.target.value))
   }
 
   useEffect(() => {
